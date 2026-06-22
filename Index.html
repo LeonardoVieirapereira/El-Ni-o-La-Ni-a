@@ -15,47 +15,42 @@
         body {
             background-color: #0f172a;
             margin: 0;
-            padding: 0;
+            padding: 20px;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             font-family: 'Montserrat', sans-serif;
             color: #334155;
-            overflow: hidden;
         }
 
-        /* CONTAINER DOS SLIDES COM TRANSIÇÃO */
+        /* CONTAINER DOS SLIDES ADAPTÁVEL */
         .presentation-wrapper {
             position: relative;
-            width: 1280px;
-            height: 720px;
+            width: 100%;
+            max-width: 1100px;
+            aspect-ratio: 16 / 9;
             background-color: #ffffff;
             border-radius: 12px;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
         .slide-container {
-            position: absolute;
-            top: 0;
-            left: 0;
             width: 100%;
             height: 100%;
-            display: flex;
+            display: none; /* Controlado via JS */
             flex-direction: column;
-            padding: 60px 100px; /* Ajustado para dar espaço às setas laterais */
+            padding: 40px 60px;
             background-color: #ffffff;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.5s ease, visibility 0.5s ease;
-            z-index: 1;
+            position: relative;
+            overflow-y: auto;
         }
 
         .slide-container.active {
-            opacity: 1;
-            visibility: visible;
-            z-index: 10;
+            display: flex;
         }
 
         /* ELEMENTOS DE DESIGN DE FUNDO */
@@ -64,18 +59,7 @@
             position: absolute;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: linear-gradient(135deg, rgba(0, 44, 91, 0.03) 0%, rgba(45, 112, 142, 0.03) 100%);
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        .slide-container::after {
-            content: '';
-            position: absolute;
-            bottom: -50px; right: -50px;
-            width: 300px; height: 300px;
-            background: radial-gradient(circle, rgba(0, 44, 91, 0.04) 0%, transparent 70%);
-            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(0, 44, 91, 0.02) 0%, rgba(45, 112, 142, 0.02) 100%);
             z-index: 0;
             pointer-events: none;
         }
@@ -85,7 +69,7 @@
         /* TIPOGRAFIA */
         h1 {
             font-family: 'Playfair Display', serif;
-            font-size: 64px;
+            font-size: 56px;
             color: #002C5B;
             margin: 0;
             line-height: 1.1;
@@ -93,21 +77,21 @@
 
         .slide-title {
             font-family: 'Playfair Display', serif;
-            font-size: 38px;
+            font-size: 32px;
             color: #002C5B;
             margin-top: 0;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             width: 100%;
             border-left: 6px solid #2D708E;
-            padding-left: 20px;
+            padding-left: 15px;
         }
 
-        h3 { font-size: 24px; color: #2D708E; margin-bottom: 15px; margin-top: 0; }
-        p, li { font-size: 18px; line-height: 1.6; color: #475569; }
-        ul { list-style-type: none; padding: 0; }
-        li { margin-bottom: 12px; }
+        h3 { font-size: 22px; color: #2D708E; margin-bottom: 12px; margin-top: 0; }
+        p, li { font-size: 16px; line-height: 1.6; color: #475569; }
+        ul { list-style-type: none; padding: 0; margin: 0; }
+        li { margin-bottom: 10px; }
         
-        .subtitle { font-size: 22px; color: #64748b; margin-top: 20px; }
+        .subtitle { font-size: 20px; color: #64748b; margin-top: 15px; }
 
         /* LAYOUTS ESPECÍFICOS */
         .content-area {
@@ -116,18 +100,18 @@
             flex-direction: column;
             justify-content: center;
             width: 100%;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
         }
 
         .title-layout { text-align: center; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; }
 
-        .two-column { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; width: 100%; align-items: center; }
+        .two-column { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; width: 100%; align-items: center; }
 
         .image-wrapper { 
-            border-radius: 16px; 
+            border-radius: 12px; 
             overflow: hidden; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.08); 
-            height: 350px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06); 
+            height: 280px; 
             background: #f8fafc;
             display: flex;
             align-items: center;
@@ -135,52 +119,54 @@
         }
         .image-wrapper img { width: 100%; height: 100%; object-fit: cover; }
 
-        .tile-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; width: 100%; }
+        .tile-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; width: 100%; }
         .tile { 
             background: #f8fafc; 
-            padding: 30px; 
-            border-radius: 16px; 
+            padding: 24px; 
+            border-radius: 12px; 
             border-top: 5px solid #2D708E;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03);
         }
-        .tile .icon { font-size: 36px; color: #2D708E; margin-bottom: 15px; }
+        .tile .icon { font-size: 32px; color: #2D708E; margin-bottom: 12px; }
 
         /* ESTILO DOS GRÁFICOS */
-        .chart-container { width: 100%; height: 320px; display: flex; align-items: flex-end; gap: 30px; padding: 20px 0; border-bottom: 2px solid #e2e8f0; }
+        .chart-container { width: 100%; height: 260px; display: flex; align-items: flex-end; gap: 20px; padding: 10px 0; border-bottom: 2px solid #e2e8f0; }
         .bar { 
             flex: 1; 
             background: linear-gradient(to top, #002C5B, #2D708E); 
-            border-radius: 8px 8px 0 0; 
+            border-radius: 6px 6px 0 0; 
             position: relative;
             display: flex; justify-content: center;
-            transition: height 0.5s ease;
         }
-        .bar-label { position: absolute; bottom: -35px; font-weight: bold; font-size: 14px; width: 100%; text-align: center; color: #475569; }
-        .bar-value { position: absolute; top: -30px; font-weight: bold; color: #002C5B; font-size: 14px; }
+        .bar-label { position: absolute; bottom: -30px; font-weight: bold; font-size: 12px; width: 100%; text-align: center; color: #475569; }
+        .bar-value { position: absolute; top: -25px; font-weight: bold; color: #002C5B; font-size: 12px; }
 
         /* TABELA */
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th { background-color: #002C5B; color: white; padding: 15px 20px; text-align: left; font-size: 18px; }
-        td { padding: 15px 20px; border-bottom: 1px solid #e2e8f0; font-size: 16px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 5px; }
+        th { background-color: #002C5B; color: white; padding: 12px 15px; text-align: left; font-size: 16px; }
+        td { padding: 12px 15px; border-bottom: 1px solid #e2e8f0; font-size: 14px; }
         tr:nth-child(even) { background-color: #f8fafc; }
 
         /* TIMELINE */
-        .timeline { display: flex; justify-content: space-between; position: relative; width: 100%; margin-top: 60px; }
-        .timeline::before { content: ''; position: absolute; top: 15px; left: 0; width: 100%; height: 4px; background: #e2e8f0; z-index: 0; }
+        .timeline { display: flex; justify-content: space-between; position: relative; width: 100%; margin-top: 40px; }
+        .timeline::before { content: ''; position: absolute; top: 12px; left: 0; width: 100%; height: 4px; background: #e2e8f0; z-index: 0; }
         .timeline-item { width: 22%; position: relative; z-index: 1; text-align: center; }
-        .timeline-dot { width: 34px; height: 34px; background: #2D708E; border: 6px solid #fff; border-radius: 50%; margin: 0 auto 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .timeline-dot { width: 28px; height: 28px; background: #2D708E; border: 5px solid #fff; border-radius: 50%; margin: 0 auto 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
 
         /* LAYOUT BLEED (La Niña) */
-        .bleed-image-layout { display: grid; grid-template-columns: 1fr 1fr; padding: 0 !important; }
-        .bleed-content { padding: 60px 80px 60px 100px; display: flex; flex-direction: column; justify-content: center; height: 100%; }
-        .bleed-image-side { width: 100%; height: 720px; object-fit: cover; }
+        .bleed-image-layout { display: grid; grid-template-columns: 1.2fr 0.8fr; padding: 0 !important; }
+        .bleed-content { padding: 40px 40px 40px 60px; display: flex; flex-direction: column; justify-content: center; height: 100%; }
+        .bleed-image-side { width: 100%; height: 100%; min-height: 400px; object-fit: cover; }
+
+        /* MATH FORMULAS */
+        #formula-container { background: #f1f5f9; padding: 10px 15px; border-radius: 8px; display: inline-block; margin-top: 10px; }
 
         /* CONTROLES E NAVEGAÇÃO */
         .navigation-controls {
             position: absolute;
-            bottom: 30px;
-            left: 100px;
-            right: 100px;
+            bottom: 20px;
+            left: 60px;
+            right: 60px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -188,7 +174,7 @@
         }
 
         .slide-counter {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: bold;
             color: #94a3b8;
             letter-spacing: 1px;
@@ -197,13 +183,13 @@
         /* Indicadores em formato de pontos (Dots) */
         .dots-container {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             align-items: center;
         }
 
         .dot {
-            width: 10px;
-            height: 10px;
+            width: 8px;
+            height: 8px;
             background-color: #cbd5e1;
             border-radius: 50%;
             cursor: pointer;
@@ -219,8 +205,8 @@
 
         .dot.active {
             background-color: #2D708E;
-            width: 24px;
-            border-radius: 5px;
+            width: 20px;
+            border-radius: 4px;
         }
 
         /* Botões de Setas Laterais Flutuantes */
@@ -228,11 +214,11 @@
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            background-color: rgba(255, 255, 255, 0.85);
+            background-color: rgba(255, 255, 255, 0.9);
             border: 1px solid #e2e8f0;
             color: #002C5B;
-            width: 50px;
-            height: 50px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -249,13 +235,8 @@
             box-shadow: 0 6px 15px rgba(0, 44, 91, 0.3);
         }
 
-        .side-arrow.arrow-prev {
-            left: 25px;
-        }
-
-        .side-arrow.arrow-next {
-            right: 25px;
-        }
+        .side-arrow.arrow-prev { left: 10px; }
+        .side-arrow.arrow-next { right: 10px; }
 
         .side-arrow:disabled {
             background-color: rgba(248, 250, 252, 0.5);
@@ -268,13 +249,29 @@
         /* INSTRUÇÕES DO TECLADO / ATALHOS */
         .keyboard-hint {
             position: absolute;
-            bottom: 12px;
+            bottom: 8px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 11px;
+            font-size: 10px;
             color: #cbd5e1;
             pointer-events: none;
             z-index: 100;
+        }
+
+        /* RESPONSIVIDADE PARA TELAS MENORES OU CELULARES */
+        @media (max-width: 768px) {
+            body { padding: 10px; overflow-y: auto; }
+            .presentation-wrapper { aspect-ratio: auto; height: auto; min-height: 90vh; }
+            .slide-container { padding: 30px 20px 80px 20px; height: auto; }
+            .two-column { grid-template-columns: 1fr; gap: 20px; }
+            .tile-grid { grid-template-columns: 1fr; gap: 15px; }
+            .bleed-image-layout { grid-template-columns: 1fr; }
+            .bleed-image-side { display: none; }
+            .bleed-content { padding: 20px; }
+            h1 { font-size: 32px; }
+            .slide-title { font-size: 24px; }
+            .side-arrow { display: none; } /* Oculta setas físicas no mobile, usa deslize/pontos */
+            .navigation-controls { left: 20px; right: 20px; bottom: 15px; }
         }
     </style>
 </head>
@@ -295,7 +292,7 @@
         <div class="title-layout">
             <h1>El Niño e La Niña</h1>
             <p class="subtitle">Compreender as Oscilações Climáticas que Movem o Planeta</p>
-            <div style="margin-top: 40px; height: 5px; width: 100px; background: #2D708E;"></div>
+            <div style="margin-top: 30px; height: 5px; width: 80px; background: #2D708E;"></div>
         </div>
     </div>
 
@@ -307,11 +304,11 @@
                 <div>
                     <p>O <strong>El Niño Oscilação Sul (ENOS)</strong> é um padrão climático recorrente que envolve mudanças na temperatura das águas do Oceano Pacífico Tropical Central e Oriental.</p>
                     <div id="formula-container">
-                        <span style="font-family: 'Times New Roman', Times, serif; font-size: 20px; font-style: italic;">
+                        <span style="font-family: 'Times New Roman', Times, serif; font-size: 18px; font-style: italic;">
                             Variação Térmica (&Delta;T) &asymp; &plusmn;0,5&deg;C
                         </span>
                     </div>
-                    <p style="margin-top: 20px;">Esta variação cíclica afeta diretamente o acoplamento oceano-atmosfera global e altera a força dos ventos alísios.</p>
+                    <p style="margin-top: 15px;">Esta variação cíclica afeta diretamente o acoplamento oceano-atmosfera global e altera a força dos ventos alísios.</p>
                 </div>
                 <div class="image-wrapper">
                     <svg width="100%" height="100%" viewBox="0 0 400 300" style="background: #e0f2fe; border-radius: 12px;">
@@ -332,9 +329,9 @@
                             <path d="M 200 130 L 210 125 M 200 130 L 210 135" />
                             <path d="M 180 150 L 190 145 M 180 150 L 190 155" />
                         </g>
-                        <text x="210" y="115" font-family="'Montserrat', sans-serif" font-size="12" fill="#0369a1" font-weight="bold">Ventos Alísios Fortes</text>
-                        <text x="20" y="270" font-family="'Montserrat', sans-serif" font-size="14" fill="#ffffff" font-weight="bold">Águas Frias (Ressurgência)</text>
-                        <text x="240" y="230" font-family="'Montserrat', sans-serif" font-size="14" fill="#ffffff" font-weight="bold">Piscina Quente Oeste</text>
+                        <text x="200" y="115" font-family="'Montserrat', sans-serif" font-size="11" fill="#0369a1" font-weight="bold">Ventos Alísios Normais</text>
+                        <text x="20" y="270" font-family="'Montserrat', sans-serif" font-size="12" fill="#ffffff" font-weight="bold">Águas Frias (Ressurgência)</text>
+                        <text x="230" y="230" font-family="'Montserrat', sans-serif" font-size="12" fill="#ffffff" font-weight="bold">Acúmulo de Água Quente</text>
                     </svg>
                 </div>
             </div>
@@ -356,8 +353,8 @@
                         <path d="M 210 140 L 210 90 M 210 90 L 205 95 M 210 90 L 215 95" stroke="#ef4444" stroke-width="2" fill="none"/>
                         <rect y="180" width="400" height="120" fill="#ef4444"/>
                         <path d="M 0 180 Q 200 210 400 180 L 400 300 L 0 300 Z" fill="#f97316" opacity="0.7"/>
-                        <text x="110" y="240" font-family="'Montserrat', sans-serif" font-size="15" fill="#ffffff" font-weight="bold">Anomalia Térmica Positiva</text>
-                        <text x="110" y="265" font-family="'Montserrat', sans-serif" font-size="12" fill="#ffffff">Pacífico Central e Oriental Quente</text>
+                        <text x="110" y="240" font-family="'Montserrat', sans-serif" font-size="14" fill="#ffffff" font-weight="bold">Anomalia Térmica Positiva</text>
+                        <text x="100" y="265" font-family="'Montserrat', sans-serif" font-size="11" fill="#ffffff">Pacífico Central e Oriental Aquecido</text>
                     </svg>
                 </div>
                 <div>
@@ -403,7 +400,7 @@
         <div class="content-area">
             <div class="tile-grid" style="grid-template-columns: 1fr 1fr; gap: 40px;">
                 <div style="text-align:center;">
-                    <div class="image-wrapper" style="height:320px;">
+                    <div class="image-wrapper" style="height:260px;">
                         <svg width="100%" height="100%" viewBox="0 0 400 300" style="background: #fef3c7; border-radius: 12px;">
                             <circle cx="330" cy="70" r="25" fill="#f59e0b" opacity="0.8"/>
                             <path d="M 0 200 L 400 200 L 400 300 L 0 300 Z" fill="#d97706"/>
@@ -419,28 +416,26 @@
                             <text x="30" y="75" font-family="'Montserrat', sans-serif" font-size="12" fill="#78350f">Norte e Nordeste sob estiagem extrema</text>
                         </svg>
                     </div>
-                    <h3 style="margin-top:15px; font-size: 20px;">Estiagem Extrema</h3>
+                    <h3 style="margin-top:15px; font-size: 18px;">Estiagem Extrema (Norte/Nordeste)</h3>
                 </div>
                 <div style="text-align:center;">
-                    <div class="image-wrapper" style="height:320px;">
+                    <div class="image-wrapper" style="height:260px;">
                         <svg width="100%" height="100%" viewBox="0 0 400 300" style="background: #e2e8f0; border-radius: 12px;">
                             <path d="M 80 80 Q 110 50 140 80 Q 170 50 200 80 Q 220 90 200 110 L 80 110 Z" fill="#475569"/>
                             <path d="M 180 90 Q 210 60 240 90 Q 270 60 300 90 Q 320 100 300 120 L 180 120 Z" fill="#64748b"/>
-                            <g stroke="#38bdf8" stroke-width="2">
-                                <line x1="100" y1="130" x2="80" y2="180" />
-                                <line x1="140" y1="130" x2="120" y2="180" />
-                                <line x1="180" y1="130" x2="160" y2="180" />
-                                <line x1="220" y1="130" x2="200" y2="180" />
-                                <line x1="260" y1="130" x2="240" y2="180" />
+                            <path d="M 170 250 L 230 240 L 260 210" />
+                                <path d="M 230 240 L 220 280 L 270 300" />
+                                <path d="M 260 210 L 320 220 L 350 260" />
+                                <path d="M 320 220 L 300 270" />
                             </g>
-                <text x="30" y="50" font-family="'Montserrat', sans-serif" font-size="16" fill="#78350f" font-weight="bold">Secas e Queimadas</text>
+                            <text x="30" y="50" font-family="'Montserrat', sans-serif" font-size="16" fill="#78350f" font-weight="bold">Secas e Queimadas</text>
                             <text x="30" y="75" font-family="'Montserrat', sans-serif" font-size="12" fill="#78350f">Norte e Nordeste sob estiagem extrema</text>
                         </svg>
                     </div>
-                    <h3 style="margin-top:15px; font-size: 20px;">Estiagem Extrema</h3>
+                    <h3 style="margin-top:15px; font-size: 18px;">Estiagem Extrema (Norte/Nordeste)</h3>
                 </div>
                 <div style="text-align:center;">
-                    <div class="image-wrapper" style="height:320px;">
+                    <div class="image-wrapper" style="height:260px;">
                         <svg width="100%" height="100%" viewBox="0 0 400 300" style="background: #e2e8f0; border-radius: 12px;">
                             <path d="M 80 80 Q 110 50 140 80 Q 170 50 200 80 Q 220 90 200 110 L 80 110 Z" fill="#475569"/>
                             <path d="M 180 90 Q 210 60 240 90 Q 270 60 300 90 Q 320 100 300 120 L 180 120 Z" fill="#64748b"/>
@@ -459,7 +454,7 @@
                             <text x="30" y="65" font-family="'Montserrat', sans-serif" font-size="12" fill="#1e293b">Excesso de precipitação no Sul</text>
                         </svg>
                     </div>
-                    <h3 style="margin-top:15px; font-size: 20px;">Inundações Severas</h3>
+                    <h3 style="margin-top:15px; font-size: 18px;">Inundações Severas (Região Sul)</h3>
                 </div>
             </div>
         </div>
@@ -472,7 +467,7 @@
             <div class="content-area" style="margin-bottom: 0;">
                 <h3>Dinâmica Reversa</h3>
                 <p>Oposto direto do El Niño, a La Niña caracteriza-se pelo <strong>resfriamento expressivo</strong> das águas do Pacífico Equatorial.</p>
-                <ul style="margin-top:20px;">
+                <ul style="margin-top:15px;">
                     <li><i class="fa-solid fa-wind" style="color:#3498DB; margin-right:10px;"></i> Fortalecimento drástico dos ventos alísios.</li>
                     <li><i class="fa-solid fa-snowflake" style="color:#3498DB; margin-right:10px;"></i> Águas frias acumuladas no leste do oceano.</li>
                     <li><i class="fa-solid fa-water" style="color:#3498DB; margin-right:10px;"></i> Ressurgência forte de águas profundas e ricas em nutrientes.</li>
@@ -480,7 +475,7 @@
             </div>
         </div>
         <div style="height: 100%; display: flex; align-items: center; justify-content: center; background: #e0f2fe;">
-            <svg width="100%" height="100%" viewBox="0 0 400 720">
+            <svg width="100%" height="100%" viewBox="0 0 400 720" style="display: block;">
                 <rect width="400" height="720" fill="#f0fdf4"/>
                 <rect width="400" height="300" fill="#ecfdf5"/>
                 <g stroke="#059669" stroke-width="4" fill="none">
@@ -593,7 +588,7 @@
                     <span class="bar-label">La Niña Forte</span>
                 </div>
             </div>
-            <p style="text-align:center; font-style:italic; margin-top:35px; font-size:15px;">
+            <p style="text-align:center; font-style:italic; margin-top:35px; font-size:14px;">
                 Valores de referência calculados com base no Índice Oceânico Niño (ONI).
             </p>
         </div>
@@ -665,12 +660,12 @@
     <!-- Slide 12: Conclusão -->
     <div class="slide-container" id="slide-12">
         <div class="title-layout">
-            <h2 style="font-size:54px; color:#002C5B; margin-bottom: 10px;">Muito Obrigado!</h2>
+            <h2 style="font-size:48px; color:#002C5B; margin-bottom: 10px;">Muito Obrigado!</h2>
             <p class="subtitle">Dúvidas sobre o El Niño e a La Niña?</p>
-            <div style="margin-top:40px; display:flex; gap:30px;">
-                 <i class="fa-solid fa-earth-americas" style="font-size:70px; color:#2D708E;"></i>
+            <div style="margin-top:30px; display:flex; gap:30px;">
+                 <i class="fa-solid fa-earth-americas" style="font-size:60px; color:#2D708E;"></i>
             </div>
-            <p style="margin-top:30px; font-size: 16px; color:#64748b;">O monitoramento contínuo é a nossa melhor ferramenta de adaptação climática.</p>
+            <p style="margin-top:20px; font-size: 15px; color:#64748b;">O monitoramento contínuo é a nossa melhor ferramenta de adaptação climática.</p>
         </div>
     </div>
 
@@ -706,13 +701,16 @@
     }
 
     function updateSlide() {
-        // Ocultar todos os slides ativos
+        // Ocultar todos os slides ativos usando display none para evitar overflow
         for (let i = 1; i <= totalSlides; i++) {
+            document.getElementById(`slide-${i}`).style.display = 'none';
             document.getElementById(`slide-${i}`).classList.remove('active');
         }
         
         // Exibir o slide atual
-        document.getElementById(`slide-${currentSlide}`).classList.add('active');
+        const activeSlide = document.getElementById(`slide-${currentSlide}`);
+        activeSlide.style.display = 'flex';
+        activeSlide.classList.add('active');
         
         // Atualizar o contador numérico de páginas
         document.getElementById('slideNum').textContent = `SLIDE ${currentSlide} / ${totalSlides}`;
@@ -762,4 +760,4 @@
 </script>
 
 </body>
-              </html>
+</html>
