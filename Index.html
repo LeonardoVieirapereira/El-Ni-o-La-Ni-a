@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Niño e La Niña - Dinâmicas Climáticas Globais</title>
+    <!-- Fontes profissionais via Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* CONFIGURAÇÃO BASE */
+        * { box-sizing: border-box; }
+        body {
+            background-color: #0f172a;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Montserrat', sans-serif;
+            color: #334155;
+            overflow: hidden;
+        }
+
+        /* CONTAINER DOS SLIDES COM TRANSIÇÃO */
+        .presentation-wrapper {
+            position: relative;
+            width: 1280px;
+            height: 720px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+        }
+
+        .slide-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 60px 100px; /* Ajustado para dar espaço às setas laterais */
+            background-color: #ffffff;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+            z-index: 1;
+        }
+
+        .slide-container.active {
+            opacity: 1;
+            visibility: visible;
+            z-index: 10;
+        }
+
+        /* ELEMENTOS DE DESIGN DE FUNDO */
+        .slide-container::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: linear-gradient(135deg, rgba(0, 44, 91, 0.03) 0%, rgba(45, 112, 142, 0.03) 100%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .slide-container::after {
+            content: '';
+            position: absolute;
+            bottom: -50px; right: -50px;
+            width: 300px; height: 300px;
+            background: radial-gradient(circle, rgba(0, 44, 91, 0.04) 0%, transparent 70%);
+            border-radius: 50%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .slide-container > * { position: relative; z-index: 2; }
+
+        /* TIPOGRAFIA */
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 64px;
+            color: #002C5B;
+            margin: 0;
+            line-height: 1.1;
+        }
+
+        .slide-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 38px;
+            color: #002C5B;
+            margin-top: 0;
+            margin-bottom: 30px;
+            width: 100%;
+            border-left: 6px solid #2D708E;
+            padding-left: 20px;
+        }
+
+        h3 { font-size: 24px; color: #2D708E; margin-bottom: 15px; margin-top: 0; }
+        p, li { font-size: 18px; line-height: 1.6; color: #475569; }
+        ul { list-style-type: none; padding: 0; }
+        li { margin-bottom: 12px; }
+        
+        .subtitle { font-size: 22px; color: #64748b; margin-top: 20px; }
+
+        /* LAYOUTS ESPECÍFICOS */
+        .content-area {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            width: 100%;
+            margin-bottom: 40px;
+        }
+
+        .title-layout { text-align: center; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+
+        .two-column { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; width: 100%; align-items: center; }
+
+        .image-wrapper { 
+            border-radius: 16px; 
+            overflow: hidden; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08); 
+            height: 350px; 
+            background: #f8fafc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .image-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+
+        .tile-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; width: 100%; }
+        .tile { 
+            background: #f8fafc; 
+            padding: 30px; 
+            border-radius: 16px; 
+            border-top: 5px solid #2D708E;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+        .tile .icon { font-size: 36px; color: #2D708E; margin-bottom: 15px; }
+
+        /* ESTILO DOS GRÁFICOS */
+        .chart-container { width: 100%; height: 320px; display: flex; align-items: flex-end; gap: 30px; padding: 20px 0; border-bottom: 2px solid #e2e8f0; }
+        .bar { 
+            flex: 1; 
+            background: linear-gradient(to top, #002C5B, #2D708E); 
+            border-radius: 8px 8px 0 0; 
+            position: relative;
+            display: flex; justify-content: center;
+            transition: height 0.5s ease;
+        }
+        .bar-label { position: absolute; bottom: -35px; font-weight: bold; font-size: 14px; width: 100%; text-align: center; color: #475569; }
+        .bar-value { position: absolute; top: -30px; font-weight: bold; color: #002C5B; font-size: 14px; }
+
+        /* TABELA */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { background-color: #002C5B; color: white; padding: 15px 20px; text-align: left; font-size: 18px; }
+        td { padding: 15px 20px; border-bottom: 1px solid #e2e8f0; font-size: 16px; }
+        tr:nth-child(even) { background-color: #f8fafc; }
+
+        /* TIMELINE */
+        .timeline { display: flex; justify-content: space-between; position: relative; width: 100%; margin-top: 60px; }
+        .timeline::before { content: ''; position: absolute; top: 15px; left: 0; width: 100%; height: 4px; background: #e2e8f0; z-index: 0; }
+        .timeline-item { width: 22%; position: relative; z-index: 1; text-align: center; }
+        .timeline-dot { width: 34px; height: 34px; background: #2D708E; border: 6px solid #fff; border-radius: 50%; margin: 0 auto 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+
+        /* LAYOUT BLEED (La Niña) */
+        .bleed-image-layout { display: grid; grid-template-columns: 1fr 1fr; padding: 0 !important; }
+        .bleed-content { padding: 60px 80px 60px 100px; display: flex; flex-direction: column; justify-content: center; height: 100%; }
+        .bleed-image-side { width: 100%; height: 720px; object-fit: cover; }
+
+        /* CONTROLES E NAVEGAÇÃO */
+        .navigation-controls {
+            position: absolute;
+            bottom: 30px;
+            left: 100px;
+            right: 100px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .slide-counter {
+            font-size: 14px;
+            font-weight: bold;
+            color: #94a3b8;
+            letter-spacing: 1px;
+        }
+
+        /* Indicadores em formato de pontos (Dots) */
+        .dots-container {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            background-color: #cbd5e1;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            padding: 0;
+        }
+
+        .dot:hover {
+            background-color: #94a3b8;
+            transform: scale(1.2);
+        }
+
+        .dot.active {
+            background-color: #2D708E;
+            width: 24px;
+            border-radius: 5px;
+        }
+
+        /* Botões de Setas Laterais Flutuantes */
+        .side-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(255, 255, 255, 0.85);
+            border: 1px solid #e2e8f0;
+            color: #002C5B;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 150;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+        }
+
+        .side-arrow:hover {
+            background-color: #002C5B;
+            color: #ffffff;
+            box-shadow: 0 6px 15px rgba(0, 44, 91, 0.3);
+        }
+
+        .side-arrow.arrow-prev {
+            left: 25px;
+        }
+
+        .side-arrow.arrow-next {
+            right: 25px;
+        }
+
+        .side-arrow:disabled {
+            background-color: rgba(248, 250, 252, 0.5);
+            border-color: #cbd5e1;
+            color: #cbd5e1;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        /* INSTRUÇÕES DO TECLADO / ATALHOS */
+        .keyboard-hint {
+            position: absolute;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11px;
+            color: #cbd5e1;
+            pointer-events: none;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+
+<div class="presentation-wrapper">
+
+    <!-- Setas Flutuantes Laterais -->
+    <button class="side-arrow arrow-prev" id="prevArrow" onclick="prevSlide()" aria-label="Slide anterior">
+        <i class="fa-solid fa-chevron-left"></i>
+    </button>
+    <button class="side-arrow arrow-next" id="nextArrow" onclick="nextSlide()" aria-label="Próximo slide">
+        <i class="fa-solid fa-chevron-right"></i>
+    </button>
+
+    <!-- Slide 1: Capa -->
+    <div class="slide-container active" id="slide-1">
+        <div class="title-layout">
+            <h1>El Niño e La Niña</h1>
+            <p class="subtitle">Compreender as Oscilações Climáticas que Movem o Planeta</p>
+            <div style="margin-top: 40px; height: 5px; width: 100px; background: #2D708E;"></div>
+        </div>
+    </div>
+
+    <!-- Slide 2: Introdução ENOS -->
+    <div class="slide-container" id="slide-2">
+        <h2 class="slide-title">O Fenómeno ENOS</h2>
+        <div class="content-area">
+            <div class="two-column">
+                <div>
+                    <p>O <strong>El Niño Oscilação Sul (ENOS)</strong> é um padrão climático recorrente que envolve mudanças na temperatura das águas do Oceano Pacífico Tropical Central e Oriental.</p>
+                    <div id="formula-container">
+                        <span style="font-family: 'Times New Roman', Times, serif; font-size: 20px; font-style: italic;">
+                            Variação Térmica (&Delta;T) &asymp; &plusmn;0,5&deg;C
+                        </span>
+                    </div>
+                    <p style="margin-top: 20px;">Esta variação cíclica afeta diretamente o acoplamento oceano-atmosfera global e altera a força dos ventos alísios.</p>
+                </div>
+                <div class="image-wrapper">
+                    <svg width="100%" height="100%" viewBox="0 0 400 300" style="background: #e0f2fe; border-radius: 12px;">
+                        <defs>
+                            <linearGradient id="oceanGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#38bdf8;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#0284c7;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                        <rect width="400" height="180" fill="#f0f9ff"/>
+                        <path d="M 50 100 Q 65 80 80 100 Q 95 80 110 100 Q 120 110 110 120 L 50 120 Z" fill="#ffffff" opacity="0.9"/>
+                        <path d="M 280 80 Q 295 60 310 80 Q 325 60 340 80 Q 350 90 340 100 L 280 100 Z" fill="#ffffff" opacity="0.9"/>
+                        <rect y="180" width="400" height="120" fill="url(#oceanGrad)"/>
+                        <path d="M 0 190 Q 50 180 100 190 T 200 190 T 300 190 T 400 190" fill="none" stroke="#ffffff" stroke-width="2" opacity="0.5"/>
+                        <g stroke="#0369a1" stroke-width="3" fill="none">
+                            <path d="M 350 130 L 200 130" />
+                            <path d="M 330 150 L 180 150" />
+                            <path d="M 200 130 L 210 125 M 200 130 L 210 135" />
+                            <path d="M 180 150 L 190 145 M 180 150 L 190 155" />
+                        </g>
+                        <text x="210" y="115" font-family="'Montserrat', sans-serif" font-size="12" fill="#0369a1" font-weight="bold">Ventos Alísios Fortes</text>
+                        <text x="20" y="270" font-family="'Montserrat', sans-serif" font-size="14" fill="#ffffff" font-weight="bold">Águas Frias (Ressurgência)</text>
+                        <text x="240" y="230" font-family="'Montserrat', sans-serif" font-size="14" fill="#ffffff" font-weight="bold">Piscina Quente Oeste</text>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 3: El Niño - O Aquecimento -->
+    <div class="slide-container" id="slide-3">
+        <h2 class="slide-title">El Niño: O Aquecimento Anómalo</h2>
+        <div class="content-area">
+            <div class="two-column">
+                <div class="image-wrapper">
+                    <svg width="100%" height="100%" viewBox="0 0 400 300" style="background: #fef2f2; border-radius: 12px;">
+                        <rect width="400" height="180" fill="#fff5f5"/>
+                        <circle cx="200" cy="50" r="25" fill="#f97316" opacity="0.8"/>
+                        <circle cx="200" cy="50" r="35" fill="#fef08a" opacity="0.3"/>
+                        <path d="M 150 140 Q 170 110 190 140 Q 210 110 230 140 Q 240 150 230 160 L 150 160 Z" fill="#cbd5e1" opacity="0.8"/>
+                        <path d="M 190 140 L 190 90 M 190 90 L 185 95 M 190 90 L 195 95" stroke="#ef4444" stroke-width="2" fill="none"/>
+                        <path d="M 210 140 L 210 90 M 210 90 L 205 95 M 210 90 L 215 95" stroke="#ef4444" stroke-width="2" fill="none"/>
+                        <rect y="180" width="400" height="120" fill="#ef4444"/>
+                        <path d="M 0 180 Q 200 210 400 180 L 400 300 L 0 300 Z" fill="#f97316" opacity="0.7"/>
+                        <text x="110" y="240" font-family="'Montserrat', sans-serif" font-size="15" fill="#ffffff" font-weight="bold">Anomalia Térmica Positiva</text>
+                        <text x="110" y="265" font-family="'Montserrat', sans-serif" font-size="12" fill="#ffffff">Pacífico Central e Oriental Quente</text>
+                    </svg>
+                </div>
+                <div>
+                    <h3>Características Principais</h3>
+                    <ul>
+                        <li><i class="fa-solid fa-temperature-arrow-up" style="color:#E67E22; margin-right:10px;"></i> Aquecimento anormal das águas superficiais do Pacífico.</li>
+                        <li><i class="fa-solid fa-wind" style="color:#E67E22; margin-right:10px;"></i> Enfraquecimento nítido dos ventos alísios.</li>
+                        <li><i class="fa-solid fa-cloud-rain" style="color:#E67E22; margin-right:10px;"></i> Deslocamento da convecção húmida para o leste.</li>
+                    </ul>
+                    <p style="margin-top: 15px;">Ocorre em intervalos de 2 a 7 anos, com duração aproximada entre 9 e 12 meses.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 4: Impactos do El Niño no Brasil -->
+    <div class="slide-container" id="slide-4">
+        <h2 class="slide-title">Impactos do El Niño no Brasil</h2>
+        <div class="content-area">
+            <div class="tile-grid">
+                <div class="tile">
+                    <div class="icon"><i class="fa-solid fa-sun" style="color: #f59e0b;"></i></div>
+                    <h3>Norte e Nordeste</h3>
+                    <p>Secas severas e redução drástica de chuvas, elevando os riscos de focos de incêndios florestais.</p>
+                </div>
+                <div class="tile" style="border-top-color:#E67E22;">
+                    <div class="icon" style="color:#E67E22;"><i class="fa-solid fa-cloud-showers-heavy"></i></div>
+                    <h3>Região Sul</h3>
+                    <p>Chuvas excessivas, tempestades severas e inundações que comprometem a infraestrutura regional.</p>
+                </div>
+                <div class="tile">
+                    <div class="icon"><i class="fa-solid fa-thermometer-half" style="color: #ef4444;"></i></div>
+                    <h3>Sudeste</h3>
+                    <p>Tendência de elevação das médias de temperatura e períodos de chuvas mais irregulares.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 5: Evidências Visuais (Contraste) -->
+    <div class="slide-container" id="slide-5">
+        <h2 class="slide-title">Evidências Visuais dos Impactos</h2>
+        <div class="content-area">
+            <div class="tile-grid" style="grid-template-columns: 1fr 1fr; gap: 40px;">
+                <div style="text-align:center;">
+                    <div class="image-wrapper" style="height:320px;">
+                        <svg width="100%" height="100%" viewBox="0 0 400 300" style="background: #fef3c7; border-radius: 12px;">
+                            <circle cx="330" cy="70" r="25" fill="#f59e0b" opacity="0.8"/>
+                            <path d="M 0 200 L 400 200 L 400 300 L 0 300 Z" fill="#d97706"/>
+                            <g stroke="#78350f" stroke-width="3">
+                                <path d="M 50 200 L 80 230 L 60 260 L 90 290" />
+                                <path d="M 80 230 L 140 220 L 170 250 L 150 300" />
+                                <path d="M 170 250 L 230 240 L 260 210" />
+                                <path d="M 230 240 L 220 280 L 270 300" />
+                                <path d="M 260 210 L 320 220 L 350 260" />
+                                <path d="M 320 220 L 300 270" />
+                            </g>
+                            <text x="30" y="50" font-family="'Montserrat', sans-serif" font-size="16" fill="#78350f" font-weight="bold">Secas e Queimadas</text>
+                            <text x="30" y="75" font-family="'Montserrat', sans-serif" font-size="12" fill="#78350f">Norte e Nordeste sob estiagem extrema</text>
+                        </svg>
+                    </div>
+                    <h3 style="margin-top:15px; font-size: 20px;">Estiagem Extrema</h3>
+                </div>
+                <div style="text-align:center;">
+                    <div class="image-wrapper" style="height:320px;">
+                        <svg width="100%" height="100%" viewBox="0 0 400 300" style="background: #e2e8f0; border-radius: 12px;">
+                            <path d="M 80 80 Q 110 50 140 80 Q 170 50 200 80 Q 220 90 200 110 L 80 110 Z" fill="#475569"/>
+                            <path d="M 180 90 Q 210 60 240 90 Q 270 60 300 90 Q 320 100 300 120 L 180 120 Z" fill="#64748b"/>
+                            <g stroke="#38bdf8" stroke-width="2">
+                                <line x1="100" y1="130" x2="80" y2="180" />
+                                <line x1="140" y1="130" x2="120" y2="180" />
+                                <line x1="180" y1="130" x2="160" y2="180" />
+                                <line x1="220" y1="130" x2="200" y2="180" />
+                                <line x1="260" y1="130" x2="240" y2="180" />
+                            </g>
+                <text x="30" y="50" font-family="'Montserrat', sans-serif" font-size="16" fill="#78350f" font-weight="bold">Secas e Queimadas</text>
+                            <text x="30" y="75" font-family="'Montserrat', sans-serif" font-size="12" fill="#78350f">Norte e Nordeste sob estiagem extrema</text>
+                        </svg>
+                    </div>
+                    <h3 style="margin-top:15px; font-size: 20px;">Estiagem Extrema</h3>
+                </div>
+                <div style="text-align:center;">
+                    <div class="image-wrapper" style="height:320px;">
+                        <svg width="100%" height="100%" viewBox="0 0 400 300" style="background: #e2e8f0; border-radius: 12px;">
+                            <path d="M 80 80 Q 110 50 140 80 Q 170 50 200 80 Q 220 90 200 110 L 80 110 Z" fill="#475569"/>
+                            <path d="M 180 90 Q 210 60 240 90 Q 270 60 300 90 Q 320 100 300 120 L 180 120 Z" fill="#64748b"/>
+                            <g stroke="#38bdf8" stroke-width="2">
+                                <line x1="100" y1="130" x2="80" y2="180" />
+                                <line x1="140" y1="130" x2="120" y2="180" />
+                                <line x1="180" y1="130" x2="160" y2="180" />
+                                <line x1="220" y1="130" x2="200" y2="180" />
+                                <line x1="260" y1="130" x2="240" y2="180" />
+                            </g>
+                            <rect y="220" width="400" height="80" fill="#0284c7"/>
+                            <path d="M 0 220 Q 100 210 200 220 T 400 220 L 400 300 L 0 300 Z" fill="#0369a1" opacity="0.6"/>
+                            <rect x="280" y="180" width="50" height="40" fill="#cbd5e1"/>
+                            <polygon points="275,180 305,150 335,180" fill="#ef4444"/>
+                            <text x="30" y="45" font-family="'Montserrat', sans-serif" font-size="16" fill="#1e293b" font-weight="bold">Inundações de Grande Porte</text>
+                            <text x="30" y="65" font-family="'Montserrat', sans-serif" font-size="12" fill="#1e293b">Excesso de precipitação no Sul</text>
+                        </svg>
+                    </div>
+                    <h3 style="margin-top:15px; font-size: 20px;">Inundações Severas</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 6: La Niña - O Resfriamento (Bleed) -->
+    <div class="slide-container bleed-image-layout" id="slide-6">
+        <div class="bleed-content">
+            <h2 class="slide-title" style="border:none; padding:0; margin-bottom: 20px;">La Niña: <br>O Resfriamento</h2>
+            <div class="content-area" style="margin-bottom: 0;">
+                <h3>Dinâmica Reversa</h3>
+                <p>Oposto direto do El Niño, a La Niña caracteriza-se pelo <strong>resfriamento expressivo</strong> das águas do Pacífico Equatorial.</p>
+                <ul style="margin-top:20px;">
+                    <li><i class="fa-solid fa-wind" style="color:#3498DB; margin-right:10px;"></i> Fortalecimento drástico dos ventos alísios.</li>
+                    <li><i class="fa-solid fa-snowflake" style="color:#3498DB; margin-right:10px;"></i> Águas frias acumuladas no leste do oceano.</li>
+                    <li><i class="fa-solid fa-water" style="color:#3498DB; margin-right:10px;"></i> Ressurgência forte de águas profundas e ricas em nutrientes.</li>
+                </ul>
+            </div>
+        </div>
+        <div style="height: 100%; display: flex; align-items: center; justify-content: center; background: #e0f2fe;">
+            <svg width="100%" height="100%" viewBox="0 0 400 720">
+                <rect width="400" height="720" fill="#f0fdf4"/>
+                <rect width="400" height="300" fill="#ecfdf5"/>
+                <g stroke="#059669" stroke-width="4" fill="none">
+                    <path d="M 350 150 L 50 150" />
+                    <path d="M 50 150 L 70 140 M 50 150 L 70 160" />
+                    <path d="M 370 190 L 70 190" />
+                    <path d="M 70 190 L 90 180 M 70 190 L 90 200" />
+                </g>
+                <text x="110" y="100" font-family="'Montserrat', sans-serif" font-size="18" fill="#047857" font-weight="bold">Alísios Superfortes</text>
+                
+                <rect y="360" width="400" height="360" fill="#0284c7"/>
+                <path d="M 0 360 Q 200 320 400 360 L 400 720 L 0 720 Z" fill="#0369a1" opacity="0.8"/>
+                <g stroke="#38bdf8" stroke-width="5" fill="none">
+                    <path d="M 200 650 L 200 420" />
+                    <path d="M 200 420 L 190 440 M 200 420 L 210 440" />
+                    <path d="M 230 630 L 230 440" />
+                    <path d="M 230 440 L 220 460 M 230 440 L 240 460" />
+                </g>
+                <text x="110" y="530" font-family="'Montserrat', sans-serif" font-size="20" fill="#ffffff" font-weight="bold">Ressurgência</text>
+                <text x="110" y="560" font-family="'Montserrat', sans-serif" font-size="14" fill="#e0f2fe">Subida de Águas Frias e Nutrientes</text>
+            </svg>
+        </div>
+    </div>
+
+    <!-- Slide 7: Impactos da La Niña no Brasil -->
+    <div class="slide-container" id="slide-7">
+        <h2 class="slide-title">Impactos da La Niña no Brasil</h2>
+        <div class="content-area">
+            <div class="tile-grid">
+                <div class="tile" style="border-top-color:#3498DB;">
+                    <div class="icon" style="color:#3498DB;"><i class="fa-solid fa-umbrella"></i></div>
+                    <h3>Norte e Nordeste</h3>
+                    <p>Aumento expressivo nas chuvas normais, auxiliando na recuperação rápida de reservatórios hídricos.</p>
+                </div>
+                <div class="tile" style="border-top-color:#3498DB;">
+                    <div class="icon" style="color:#3498DB;"><i class="fa-solid fa-wheat-awn-circle-exclamation"></i></div>
+                    <h3>Região Sul</h3>
+                    <p>Estiagens severas e secas prolongadas, provocando grandes prejuízos para o setor agrícola.</p>
+                </div>
+                <div class="tile" style="border-top-color:#3498DB;">
+                    <div class="icon" style="color:#3498DB;"><i class="fa-solid fa-snowflake"></i></div>
+                    <h3>Sudeste e Centro-Oeste</h3>
+                    <p>Facilita a entrada de frentes frias fortes, provocando quedas bruscas de temperatura no inverno.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 8: Tabela Comparativa -->
+    <div class="slide-container" id="slide-8">
+        <h2 class="slide-title">Resumo Comparativo das Fases</h2>
+        <div class="content-area">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Característica</th>
+                        <th>El Niño (Fase Quente)</th>
+                        <th>La Niña (Fase Fria)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Ventos Alísios</strong></td>
+                        <td>Sopram enfraquecidos ou invertidos</td>
+                        <td>Sopram muito mais fortes que o padrão</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Águas do Pacífico</strong></td>
+                        <td>Superaquecimento (Anomalia positiva)</td>
+                        <td>Resfriamento acentuado (Anomalia negativa)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Norte/Nordeste Br</strong></td>
+                        <td>Períodos severos de seca</td>
+                        <td>Aumento das chuvas regionais</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Região Sul Br</strong></td>
+                        <td>Excesso de chuvas e inundações</td>
+                        <td>Secas severas e perdas agrícolas</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Slide 9: Anomalias de Temperatura Médias -->
+    <div class="slide-container" id="slide-9">
+        <h2 class="slide-title">Anomalias de Temperatura Médias</h2>
+        <div class="content-area">
+            <div class="chart-container">
+                <div class="bar" style="height: 85%; background: #E67E22;">
+                    <span class="bar-value">+2.5°C</span>
+                    <span class="bar-label">El Niño Forte</span>
+                </div>
+                <div class="bar" style="height: 50%; background: #F39C12;">
+                    <span class="bar-value">+1.0°C</span>
+                    <span class="bar-label">El Niño Mod.</span>
+                </div>
+                <div class="bar" style="height: 15%; background: #94a3b8;">
+                    <span class="bar-value">0°C</span>
+                    <span class="bar-label">Neutro</span>
+                </div>
+                <div class="bar" style="height: 45%; background: #3498DB;">
+                    <span class="bar-value">-1.2°C</span>
+                    <span class="bar-label">La Niña Mod.</span>
+                </div>
+                <div class="bar" style="height: 75%; background: #2980B9;">
+                    <span class="bar-value">-2.2°C</span>
+                    <span class="bar-label">La Niña Forte</span>
+                </div>
+            </div>
+            <p style="text-align:center; font-style:italic; margin-top:35px; font-size:15px;">
+                Valores de referência calculados com base no Índice Oceânico Niño (ONI).
+            </p>
+        </div>
+    </div>
+
+    <!-- Slide 10: Ciclos Históricos -->
+    <div class="slide-container" id="slide-10">
+        <h2 class="slide-title">Ciclo de Vida do Fenómeno</h2>
+        <div class="content-area">
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <h3>Início</h3>
+                    <p>Geralmente surge entre Abril e Junho.</p>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot" style="background-color: #f1c40f;"></div>
+                    <h3>Evolução</h3>
+                    <p>Intensificação gradual das pressões no Pacífico.</p>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot" style="background-color: #e67e22;"></div>
+                    <h3>Pico Médio</h3>
+                    <p>Fase crítica entre Novembro e Janeiro.</p>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot" style="background-color: #95a5a6;"></div>
+                    <h3>Dissipação</h3>
+                    <p>Retorno à neutralidade de Março a Maio.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 11: Setor Agrícola -->
+    <div class="slide-container" id="slide-11">
+        <h2 class="slide-title">Desafios no Setor Agrícola</h2>
+        <div class="content-area">
+            <div class="two-column">
+                <div>
+                    <p>As variações climáticas drásticas causadas pelo ENOS impactam criticamente a produção alimentar e a economia global:</p>
+                    <ul style="margin-top:20px;">
+                        <li><strong>Quebra de Safra:</strong> A produção de milho e soja é vulnerável a secas da La Niña no Sul.</li>
+                        <li><strong>Logística e Transportes:</strong> Enchentes severas inviabilizam rotas terrestres de escoamento.</li>
+                        <li><strong>Insumos e Preços:</strong> Oscilações inesperadas causam flutuações rápidas de preços nos mercados.</li>
+                    </ul>
+                </div>
+                <div class="image-wrapper">
+                    <svg width="100%" height="100%" viewBox="0 0 400 300" style="background: #f0fdf4; border-radius: 12px;">
+                        <circle cx="100" cy="60" r="20" fill="#f59e0b" opacity="0.8"/>
+                        <path d="M 260 70 Q 280 50 300 70 Q 320 50 340 70 Q 350 80 340 90 L 260 90 Z" fill="#94a3b8"/>
+                        <line x1="280" y1="100" x2="275" y2="120" stroke="#38bdf8" stroke-width="2"/>
+                        <line x1="310" y1="100" x2="305" y2="120" stroke="#38bdf8" stroke-width="2"/>
+                        <rect y="180" width="400" height="120" fill="#15803d"/>
+                        <path d="M 0 200 L 400 180" stroke="#166534" stroke-width="4"/>
+                        <g stroke="#86efac" stroke-width="3" fill="none">
+                            <path d="M 50 180 Q 45 160 30 160 M 50 180 Q 55 155 70 160" />
+                            <path d="M 150 180 Q 145 160 130 160 M 150 180 Q 155 155 170 160" />
+                            <path d="M 250 180 Q 245 160 230 160 M 250 180 Q 255 155 270 160" />
+                            <path d="M 350 180 Q 345 160 330 160 M 350 180 Q 355 155 370 160" />
+                        </g>
+                        <text x="30" y="270" font-family="'Montserrat', sans-serif" font-size="14" fill="#ffffff" font-weight="bold">Vulnerabilidade Alimentar Global</text>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 12: Conclusão -->
+    <div class="slide-container" id="slide-12">
+        <div class="title-layout">
+            <h2 style="font-size:54px; color:#002C5B; margin-bottom: 10px;">Muito Obrigado!</h2>
+            <p class="subtitle">Dúvidas sobre o El Niño e a La Niña?</p>
+            <div style="margin-top:40px; display:flex; gap:30px;">
+                 <i class="fa-solid fa-earth-americas" style="font-size:70px; color:#2D708E;"></i>
+            </div>
+            <p style="margin-top:30px; font-size: 16px; color:#64748b;">O monitoramento contínuo é a nossa melhor ferramenta de adaptação climática.</p>
+        </div>
+    </div>
+
+    <!-- CONTROLES COMUNS DE NAVEGAÇÃO -->
+    <div class="navigation-controls">
+        <div class="slide-counter" id="slideNum">SLIDE 1 / 12</div>
+        
+        <!-- Indicadores (Pontos/Dots) Gerados Dinamicamente via JavaScript -->
+        <div class="dots-container" id="dotsContainer"></div>
+    </div>
+
+    <div class="keyboard-hint">Dica: Use as setas do teclado &larr; &rarr; para navegar</div>
+
+</div>
+
+<script>
+    // SISTEMA DE NAVEGAÇÃO INTERATIVO
+    let currentSlide = 1;
+    const totalSlides = 12;
+
+    // Gerar os pontos de navegação (Dots) no rodapé de forma dinâmica
+    const dotsContainer = document.getElementById('dotsContainer');
+    for (let i = 1; i <= totalSlides; i++) {
+        const dot = document.createElement('button');
+        dot.classList.add('dot');
+        if (i === 1) dot.classList.add('active');
+        dot.setAttribute('aria-label', `Ir para o slide ${i}`);
+        dot.addEventListener('click', () => {
+            currentSlide = i;
+            updateSlide();
+        });
+        dotsContainer.appendChild(dot);
+    }
+
+    function updateSlide() {
+        // Ocultar todos os slides ativos
+        for (let i = 1; i <= totalSlides; i++) {
+            document.getElementById(`slide-${i}`).classList.remove('active');
+        }
+        
+        // Exibir o slide atual
+        document.getElementById(`slide-${currentSlide}`).classList.add('active');
+        
+        // Atualizar o contador numérico de páginas
+        document.getElementById('slideNum').textContent = `SLIDE ${currentSlide} / ${totalSlides}`;
+        
+        // Atualizar os estados ativos dos Pontos (Dots)
+        const dots = document.querySelectorAll('.dot');
+        dots.forEach((dot, index) => {
+            if (index + 1 === currentSlide) {
+                dot.classList.add('active');
+            } else {
+                dot.classList.remove('active');
+            }
+        });
+
+        // Atualizar botões de seta lateral (desativar se estiver no limite)
+        document.getElementById('prevArrow').disabled = (currentSlide === 1);
+        document.getElementById('nextArrow').disabled = (currentSlide === totalSlides);
+    }
+
+    // Avançar de Slide
+    function nextSlide() {
+        if (currentSlide < totalSlides) {
+            currentSlide++;
+            updateSlide();
+        }
+    }
+
+    // Retroceder de Slide
+    function prevSlide() {
+        if (currentSlide > 1) {
+            currentSlide--;
+            updateSlide();
+        }
+    }
+
+    // Suporte nativo para navegação física com as setas do teclado
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'ArrowRight' || event.key === 'Space') {
+            nextSlide();
+        } else if (event.key === 'ArrowLeft') {
+            prevSlide();
+        }
+    });
+
+    // Inicialização da apresentação
+    updateSlide();
+</script>
+
+</body>
+              </html>
